@@ -18,6 +18,17 @@
       transform: rotate(3deg);
     }
 
+    // Dark mode
+    &.dark {
+      background: #555;
+
+      p,
+      h3,
+      div {
+        color: #e4e4e4;
+      }
+    }
+
     h3 {
       color: #555;
       margin-bottom: 6px;
