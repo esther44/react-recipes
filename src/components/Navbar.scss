@@ -1,0 +1,33 @@
+.navbar {
+  background: #58249c;
+  padding: 20px;
+  color: #fff;
+
+  nav {
+    display: flex;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  a {
+    &.brand {
+      margin-right: auto;
+      color: #fff;
+      text-decoration: none;
+    }
+    &:last-child {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 40px;
+      padding: 8px;
+      border: 1px solid #fff;
+      border-radius: 4px;
+
+      &:hover {
+        background: #fff;
+        color: #333;
+      }
+    }
+  }
+}
