@@ -1,25 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import "./Recipe.scss";
-import { useFetch } from "../../hooks/useFetch";
 import { useTheme } from "../../hooks/useTheme";
+import { projectFireStore } from "../../firebase/config";
 
 export default function Recipe() {
   const { id } = useParams();
-  const url = "http://localhost:3000/recipes/" + id;
-  const { data: recipe, isPending, error } = useFetch(url);
   const history = useHistory();
-  const {mode} = useTheme()
+  const { mode } = useTheme();
+
+  const [recipe, SetRecipe] = useState(null);
+  const [isPending, setIsPending] = useState(false);
+  const [error, SetError] = useState(false);
 
   useEffect(() => {
-    if (error) {
-      // redirect
-      //   history.goBack()
-      setTimeout(() => {
-        history.push("/");
-      }, 2000);
-    }
-  }, [error, history]);
+    setIsPending(true);
+
+    const unsubscribe = projectFireStore
+      .collection("recipes")
+      .doc(id)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          setIsPending(false);
+          SetRecipe(doc.data());
+        } else {
+          setIsPending(false);
+          SetError("Couldn't find that recipe");
+        }
+      });
+
+      return () => unsubscribe()
+  }, []);
+
+  const handleClick = () => {
+    projectFireStore.collection("recipes").doc(id).update({
+      title: "Something completaly differents",
+    });
+  };
+
   return (
     <div className={`recipe ${mode}`}>
       {isPending && <p className="loading">Loading...</p>}
@@ -29,9 +47,12 @@ export default function Recipe() {
           <h2 className="page-title">{recipe.title}</h2>
           <p>Takes {recipe.cookingTime} to cook.</p>
           <ul>
-              {recipe.ingredients.map(ingredient => <li key={ingredient}>{ingredient}</li>)}
+            {recipe.ingredients.map((ingredient) => (
+              <li key={ingredient}>{ingredient}</li>
+            ))}
           </ul>
           <p className="method">{recipe.method}</p>
+          <button onClick={handleClick}>Update me</button>
         </>
       )}
     </div>
